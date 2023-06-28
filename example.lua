@@ -12,46 +12,36 @@
 --]]
 
 ---You can set a variable to a class or just Class.require 'ClassName'
-Class.new("ARandomClass", function(class)
+---@class ARandomClass: BaseObject
+---@overload fun(name: string, some_variable: string): ARandomClass
+local ARandomClass = Class.new "ARandomClass";
 
-    ---@class ARandomClass: BaseObject
-    local self = class;
+function ARandomClass:Constructor(name, some_variable)
+    self.name = name;
+    self.some_variable = some_variable;
+end
 
-    function self:Constructor(name, some_variable)
-        self.name = name;
-        self.some_variable = some_variable;
-    end
-
-    function self:PrintName(...)
-        print(self, self.name, self.some_variable, ...);
-    end
-
-    return self;
-
-end);
+function ARandomClass:PrintName(...)
+    print(self, self.name, self.some_variable, ...);
+end
 
 --You can require a class like this:
-local ARandomClass = Class.require 'ARandomClass';
+local ARandomClass_required = Class.require 'ARandomClass';
 
---or you can also do like this: local ARandomChildClass = Class.extends 
-local ARandomChildClass = Class.extends("ARandomChildClass", ARandomClass, function(class)
+--or you can also do like this: local ARandomChildClass = Class.extends
+---@class ARandomChildClass: ARandomClass
+---@overload fun(name: string, some_variable: string, some_other_variable: string): ARandomChildClass
+local ARandomChildClass = Class.extends ( "ARandomChildClass", ARandomClass_required );
 
-    ---@class ARandomChildClass: ARandomClass
-    local self = class;
+function ARandomChildClass:Constructor(name, some_variable, some_other_variable)
+    self:super(ARandomClass, name, some_variable);
+    self.some_other_variable = some_other_variable;
+end
 
-    function self:Constructor(name, some_variable, some_other_variable)
-        self:super(ARandomClass, name, some_variable);
-        self.some_other_variable = some_other_variable;
-    end
-
-    function self:PrintName()
-        print("Overwriting PrintName method but without breaking it", self.some_other_variable);
-        self:CallParentMethod(ARandomClass, "PrintName", "Hello From children");
-    end
-
-    return self;
-
-end);
+function ARandomChildClass:PrintName()
+    print("Overwriting PrintName method but without breaking it", self.some_other_variable);
+    self:CallParentMethod(ARandomClass, "PrintName", "Hello From children");
+end
 
 local instance = ARandomChildClass("Hello", "World", "Test");
 
